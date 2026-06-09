@@ -4,24 +4,28 @@ on:
   push:
     branches:
       - main
-      - master
   pull_request:
     branches:
       - main
-      - master
+  workflow_dispatch:
 
 jobs:
-  flutter-test:
+  flutter-unit-test:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
 
+      - name: Show project root
+        run: |
+          pwd
+          ls -la
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: 'stable'
+          channel: stable
 
       - name: Install dependencies
         run: flutter pub get
