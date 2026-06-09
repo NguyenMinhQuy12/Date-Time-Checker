@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Date Time Checker E2E Demo</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f7fb;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .container {
+      position: fixed;
+      left: calc(50vw + 120px);
+      top: 50vh;
+      transform: translate(-50%, -50%);
+
+      width: 460px;
+      background: white;
+      padding: 36px 34px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+      text-align: center;
+    }
+
+    h1 {
+      color: #222;
+      margin: 0 0 32px 0;
+      font-size: 34px;
+      letter-spacing: 1px;
+    }
+
+    .form-group {
+      width: 100%;
+      text-align: left;
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: #333;
+    }
+
+    input {
+      width: 100%;
+      height: 46px;
+      font-size: 22px;
+      padding: 8px 12px;
+      border: 1px solid #aaa;
+      border-radius: 8px;
+      outline: none;
+      transition: 0.2s;
+    }
+
+    input:focus {
+      border-color: #4f46e5;
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+    }
+
+    .button-group {
+      margin-top: 28px;
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+    }
+
+    button {
+      min-width: 130px;
+      padding: 13px 22px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: 0.2s;
+    }
+
+    #checkBtn {
+      background: #4f46e5;
+      color: white;
+    }
+
+    #clearBtn {
+      background: #ef4444;
+      color: white;
+    }
+
+    #result {
+      margin: 30px 0 0 0;
+      font-size: 38px;
+      font-weight: bold;
+      min-height: 50px;
+      text-align: center;
+    }
+
+    .valid {
+      color: #16a34a;
+    }
+
+    .invalid {
+      color: #dc2626;
+    }
+
+    .note {
+      margin-top: 18px;
+      color: #666;
+      font-size: 15px;
+      text-align: center;
+    }
+
+    #automationStatus {
+      margin-top: 16px;
+      min-height: 26px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #4f46e5;
+      text-align: center;
+    }
+
+    .automation-highlight {
+      outline: 4px solid #facc15;
+      box-shadow: 0 0 0 8px rgba(250, 204, 21, 0.35);
+      transform: scale(1.05);
+    }
+
+    .automation-field-highlight {
+      border-color: #facc15 !important;
+      box-shadow: 0 0 0 5px rgba(250, 204, 21, 0.35) !important;
+      transform: scale(1.02);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Date Time Checker</h1>
+
+    <div class="form-group">
+      <label for="day">Day</label>
+      <input id="day" placeholder="Enter day" />
+    </div>
+
+    <div class="form-group">
+      <label for="month">Month</label>
+      <input id="month" placeholder="Enter month" />
+    </div>
+
+    <div class="form-group">
+      <label for="year">Year</label>
+      <input id="year" placeholder="Enter year" />
+    </div>
+
+    <div class="button-group">
+      <button id="checkBtn">CHECK DATE</button>
+      <button id="clearBtn">CLEAR</button>
+    </div>
+
+    <h2 id="result"></h2>
+
+    <div id="automationStatus"></div>
+
+    <div class="note">
+      Year range: 1920 - 3000
+    </div>
+  </div>
+
+  <script>
+    function isLeapYear(year) {
+      return year % 400 === 0 || (year % 4 === 0 && year % 100 !== 0);
+    }
+
+    function daysInMonth(month, year) {
+      if ([1, 3, 5, 7, 8, 10, 12].includes(month)) return 31;
+      if ([4, 6, 9, 11].includes(month)) return 30;
+      if (month === 2) return isLeapYear(year) ? 29 : 28;
+      return 0;
+    }
+
+    function checkDate(day, month, year) {
+      if (day < 1 || day > 31) return false;
+      if (month < 1 || month > 12) return false;
+      if (year < 1920 || year > 3000) return false;
+
+      return day <= daysInMonth(month, year);
+    }
+
+    function setAutomationStatus(message) {
+      document.getElementById('automationStatus').innerText = message;
+    }
+
+    function clearAutomationStatus() {
+      document.getElementById('automationStatus').innerText = '';
+    }
+
+    function highlightElement(selector) {
+      const element = document.querySelector(selector);
+
+      if (!element) return;
+
+      if (element.tagName === 'INPUT') {
+        element.classList.add('automation-field-highlight');
+      } else {
+        element.classList.add('automation-highlight');
+      }
+    }
+
+    function removeHighlight(selector) {
+      const element = document.querySelector(selector);
+
+      if (!element) return;
+
+      element.classList.remove('automation-highlight');
+      element.classList.remove('automation-field-highlight');
+    }
+
+    function clearAllHighlights() {
+      removeHighlight('#day');
+      removeHighlight('#month');
+      removeHighlight('#year');
+      removeHighlight('#checkBtn');
+      removeHighlight('#clearBtn');
+    }
+
+    document.getElementById('day').addEventListener('focus', function () {
+      clearAllHighlights();
+      highlightElement('#day');
+      setAutomationStatus('Automation is entering DAY...');
+    });
+
+    document.getElementById('month').addEventListener('focus', function () {
+      clearAllHighlights();
+      highlightElement('#month');
+      setAutomationStatus('Automation is entering MONTH...');
+    });
+
+    document.getElementById('year').addEventListener('focus', function () {
+      clearAllHighlights();
+      highlightElement('#year');
+      setAutomationStatus('Automation is entering YEAR...');
+    });
+
+    document.getElementById('checkBtn').onmouseenter = function () {
+      clearAllHighlights();
+      highlightElement('#checkBtn');
+      setAutomationStatus('Automation is clicking CHECK DATE...');
+    };
+
+    document.getElementById('clearBtn').onmouseenter = function () {
+      clearAllHighlights();
+      highlightElement('#clearBtn');
+      setAutomationStatus('Automation is clicking CLEAR...');
+    };
+
+    document.getElementById('checkBtn').onclick = function () {
+      clearAllHighlights();
+      highlightElement('#checkBtn');
+      setAutomationStatus('Automation clicked CHECK DATE.');
+
+      const day = Number(document.getElementById('day').value);
+      const month = Number(document.getElementById('month').value);
+      const year = Number(document.getElementById('year').value);
+
+      const valid = checkDate(day, month, year);
+      const result = document.getElementById('result');
+
+      result.innerText = valid ? 'Valid' : 'Invalid';
+      result.className = valid ? 'valid' : 'invalid';
+    };
+
+    document.getElementById('clearBtn').onclick = function () {
+      clearAllHighlights();
+      highlightElement('#clearBtn');
+      setAutomationStatus('Automation clicked CLEAR.');
+
+      document.getElementById('day').value = '';
+      document.getElementById('month').value = '';
+      document.getElementById('year').value = '';
+
+      const result = document.getElementById('result');
+      result.innerText = '';
+      result.className = '';
+
+      setTimeout(function () {
+        clearAllHighlights();
+        clearAutomationStatus();
+      }, 500);
+    };
+  </script>
+</body>
+</html>
